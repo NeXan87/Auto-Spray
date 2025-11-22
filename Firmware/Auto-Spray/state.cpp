@@ -5,6 +5,7 @@
 #include <Arduino.h>
 
 State currentState = STATE_IDLE;
+Bounce debouncedButton;
 
 uint32_t tLightOn = 0;
 uint32_t tBlockStart = 0;
@@ -12,18 +13,28 @@ uint32_t tBlink = 0;
 
 bool wasAutoMode = false;
 
-inline bool isLightOn() { return digitalRead(PIN_LIGHT) == HIGH; }
-inline bool isButtonPressed() { return digitalRead(PIN_BUTTON) == LOW; }
-inline bool isAutoModeEnabled() { return digitalRead(PIN_MODE) == LOW; }
+inline bool isLightOn() {
+  return digitalRead(PIN_LIGHT) == HIGH;
+}
+inline bool isButtonPressed() {
+  return digitalRead(PIN_BUTTON) == LOW;
+}
+inline bool isAutoModeEnabled() {
+  return digitalRead(PIN_MODE) == LOW;
+}
 
 void initStateMachine() {
   currentState = STATE_IDLE;
+  debouncedButton.attach(PIN_BUTTON, INPUT_PULLUP);
+  debouncedButton.interval(25);
 }
 
 void updateStateMachine() {
   uint32_t now = millis();
   bool isLight = isLightOn();
   bool isAuto = isAutoModeEnabled();
+
+  debouncedButton.update();
 
   // --- Смена режима ---
   if (isAuto && !wasAutoMode && isLight) tLightOn = now;
@@ -58,9 +69,11 @@ void updateStateMachine() {
   // --------------------------
   // КНОПКА
   // --------------------------
-  if (isButtonPressed() && currentState != STATE_SPRAY) {
-    currentState = STATE_SPRAY;
-    startSpray();
+  if (debouncedButton.fell()) {
+    if (currentState != STATE_SPRAY) {
+      currentState = STATE_SPRAY;
+      startSpray();
+    }
   }
 
   // --------------------------

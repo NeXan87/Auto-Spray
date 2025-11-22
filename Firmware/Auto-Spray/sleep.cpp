@@ -5,6 +5,7 @@
 #include "sleep.h"
 #include <avr/sleep.h>
 #include <avr/power.h>
+#include <Arduino.h>
 
 void initSleepMode() {
   // Настройка прерываний: оба пина пробуждают из POWER_DOWN

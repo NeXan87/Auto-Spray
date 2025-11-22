@@ -19,7 +19,6 @@
 void setup() {
   // Инициализация пинов
   pinMode(PIN_LIGHT, INPUT);
-  pinMode(PIN_BUTTON, INPUT_PULLUP);
   pinMode(PIN_MODE, INPUT_PULLUP);
 
   pinMode(PIN_MOTOR, OUTPUT);
@@ -43,12 +42,12 @@ void setup() {
   digitalWrite(PIN_BUZZER, LOW);                        // Выключаем звук
   updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);  // Гасим LED
 
-  // Инициализация основной логики
-  initStateMachine();
-
 #if ENABLE_SLEEP_MODE
   initSleepMode();
 #endif
+
+  // Инициализация основной логики
+  initStateMachine();
 }
 
 // -----------------------------------------------------------
