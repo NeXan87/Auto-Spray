@@ -13,6 +13,7 @@
 // SETUP
 // -----------------------------------------------------------
 void setup() {
+  // Инициализация пинов
   pinMode(PIN_LIGHT, INPUT);
   pinMode(PIN_BUTTON, INPUT_PULLUP);
   pinMode(PIN_MODE, INPUT_PULLUP);
@@ -27,13 +28,18 @@ void setup() {
   pinMode(PIN_BUZZER, OUTPUT);
   digitalWrite(PIN_BUZZER, LOW);
 
-  updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
+  // Стартовая последовательность: 1 секунда писка + цикл цветов
+  digitalWrite(PIN_BUZZER, HIGH);  // Включаем звук
+  updateLed(LED_RED_ON, LED_GREEN_OFF, LED_BLUE_OFF);
+  delay(200);  // Красный
+  updateLed(LED_RED_OFF, LED_GREEN_ON, LED_BLUE_OFF);
+  delay(200);  // Зелёный
+  updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
+  delay(200);                                           // Синий
+  digitalWrite(PIN_BUZZER, LOW);                        // Выключаем звук
+  updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);  // Гасим LED
 
-  // Стартовый писк 1 секунда
-  digitalWrite(PIN_BUZZER, HIGH);
-  delay(1000);
-  digitalWrite(PIN_BUZZER, LOW);
-
+  // Инициализация основной логики
   initStateMachine();
 }
 
