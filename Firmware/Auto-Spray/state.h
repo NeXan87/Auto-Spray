@@ -7,4 +7,4 @@ void initStateMachine();
 void updateStateMachine();
 
 extern State currentState;
-extern Bounce debouncedButton;
+extern Bounce button;

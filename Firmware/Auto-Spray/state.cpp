@@ -5,7 +5,7 @@
 #include <Arduino.h>
 
 State currentState = STATE_IDLE;
-Bounce debouncedButton;
+Bounce button;
 
 uint32_t tLightOn = 0;
 uint32_t tBlockStart = 0;
@@ -17,19 +17,17 @@ bool wasAutoMode = false;
 bool buttonPressed = false;
 
 inline bool isLightOn() {
-  return digitalRead(PIN_LIGHT) == HIGH;
+  return digitalRead(PIN_LIGHT) == LOW;
 }
-inline bool isButtonPressed() {
-  return digitalRead(PIN_BUTTON) == LOW;
-}
+
 inline bool isAutoModeEnabled() {
   return digitalRead(PIN_MODE) == LOW;
 }
 
 void initStateMachine() {
   currentState = STATE_IDLE;
-  debouncedButton.attach(PIN_BUTTON, INPUT_PULLUP);
-  debouncedButton.interval(50);
+  button.attach(PIN_BUTTON, INPUT_PULLUP);
+  button.interval(50);
 }
 
 void updateStateMachine() {
@@ -37,7 +35,7 @@ void updateStateMachine() {
   bool isLight = isLightOn();
   bool isAuto = isAutoModeEnabled();
 
-  debouncedButton.update();
+  button.update();
 
   // --------------------------
   // ПИСК ПРИ СБРОСЕ БЛОКИРОВКИ
@@ -50,11 +48,11 @@ void updateStateMachine() {
     return;  // не обрабатываем другие события во время писка
   }
 
-  if (debouncedButton.fell()) {
+  if (button.fell()) {
     buttonPressed = true;
     buttonPressStartTime = now;
   }
-  if (debouncedButton.rose()) {
+  if (button.rose()) {
     buttonPressed = false;
   }
 
@@ -100,7 +98,7 @@ void updateStateMachine() {
   // --------------------------
   // КНОПКА
   // --------------------------
-  if (debouncedButton.fell()) {
+  if (button.fell()) {
     if (currentState != STATE_SPRAY) {
       currentState = STATE_SPRAY;
       startSpray();
