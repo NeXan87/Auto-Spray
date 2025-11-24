@@ -20,16 +20,15 @@ void setup() {
   // Инициализация пинов
   pinMode(PIN_LIGHT, INPUT);
   pinMode(PIN_MODE, INPUT_PULLUP);
-
-  pinMode(PIN_MOTOR, OUTPUT);
-  digitalWrite(PIN_MOTOR, LOW);
-
+  pinMode(PIN_MOTOR_IN1, OUTPUT);
+  pinMode(PIN_MOTOR_IN2, OUTPUT);
   pinMode(PIN_LED_R, OUTPUT);
   pinMode(PIN_LED_G, OUTPUT);
   pinMode(PIN_LED_B, OUTPUT);
-
   pinMode(PIN_BUZZER, OUTPUT);
-  digitalWrite(PIN_BUZZER, LOW);
+
+  digitalWrite(PIN_MOTOR_IN1, LOW);
+  digitalWrite(PIN_MOTOR_IN2, LOW);
 
   // Стартовая последовательность: 1 секунда писка + цикл цветов
   digitalWrite(PIN_BUZZER, HIGH);  // Включаем звук

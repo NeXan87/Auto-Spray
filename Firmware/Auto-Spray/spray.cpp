@@ -1,41 +1,28 @@
 #include "config.h"
 #include "spray.h"
 
-uint8_t sprayPhase = 0;
-uint32_t tSpray = 0;
-
 void startSpray() {
-  sprayPhase = 0;
-  tSpray = millis();
+  // Гарантированная остановка перед стартом
+  digitalWrite(PIN_MOTOR_IN1, LOW);
+  digitalWrite(PIN_MOTOR_IN2, LOW);
 }
 
 bool runSpray() {
-  uint32_t now = millis();
-
-  switch (sprayPhase) {
-    case 0:
-      digitalWrite(PIN_MOTOR, HIGH);
-      if (now - tSpray >= SPRAY_PHASE1_MS) {
-        digitalWrite(PIN_MOTOR, LOW);
-        sprayPhase = 1;
-        tSpray = now;
-      }
-      break;
-
-    case 1:
-      if (now - tSpray >= SPRAY_PAUSE_MS) {
-        sprayPhase = 2;
-        tSpray = now;
-      }
-      break;
-
-    case 2:
-      digitalWrite(PIN_MOTOR, HIGH);
-      if (now - tSpray >= SPRAY_PHASE2_MS) {
-        digitalWrite(PIN_MOTOR, LOW);
-        return true;
-      }
-      break;
+  for (uint8_t i = 0; i < SPRAY_PULSE_COUNT; i++) {
+    // Включаем мотор вперёд
+    digitalWrite(PIN_MOTOR_IN1, HIGH);
+    digitalWrite(PIN_MOTOR_IN2, LOW);
+    
+    delay(SPRAY_ON_MS);
+    
+    // Останавливаем
+    digitalWrite(PIN_MOTOR_IN1, LOW);
+    digitalWrite(PIN_MOTOR_IN2, LOW);
+    
+    // Пауза между пшиками (кроме последнего)
+    if (i < SPRAY_PULSE_COUNT - 1) {
+      delay(SPRAY_OFF_MS);
+    }
   }
-  return false;
+  return true;
 }
