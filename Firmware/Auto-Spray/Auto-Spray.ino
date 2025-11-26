@@ -1,7 +1,6 @@
 /********************************************************************
- * Smart Air Freshener – Li-ion Battery Version (3.3V)
- * Platform: Arduino Pro Mini (ATmega328P 8MHz)
- * Author: ChatGPT (functional split version)
+ * Smart Air Freshener
+ * Platform: Arduino Pro Mini (ATmega328P 8MHz, 3.3V)
  ********************************************************************/
 
 #include "config.h"
@@ -13,11 +12,28 @@
 #include "sleep.h"
 #endif
 
+void runStartupSequence() {
+  digitalWrite(PIN_BUZZER, HIGH);  // Включаем писк
+
+  updateLed(LED_RED_ON, LED_GREEN_OFF, LED_BLUE_OFF);
+  delay(TIME_STARTUP_DELAY_MS);
+
+  updateLed(LED_RED_OFF, LED_GREEN_ON, LED_BLUE_OFF);
+  delay(TIME_STARTUP_DELAY_MS);
+
+  updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
+  delay(TIME_STARTUP_DELAY_MS);
+
+  updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
+  delay(TIME_STARTUP_DELAY_MS);
+
+  digitalWrite(PIN_BUZZER, LOW);  // Выключаем писк
+}
+
 // -----------------------------------------------------------
 // SETUP
 // -----------------------------------------------------------
 void setup() {
-  // Инициализация пинов
   pinMode(PIN_LIGHT, INPUT);
   pinMode(PIN_MODE, INPUT_PULLUP);
   pinMode(PIN_MOTOR_IN1, OUTPUT);
@@ -30,23 +46,12 @@ void setup() {
   digitalWrite(PIN_MOTOR_IN1, LOW);
   digitalWrite(PIN_MOTOR_IN2, LOW);
 
-  // Стартовая последовательность: 1 секунда писка + цикл цветов
-  digitalWrite(PIN_BUZZER, HIGH);  // Включаем звук
-  updateLed(LED_RED_ON, LED_GREEN_OFF, LED_BLUE_OFF);
-  delay(TIME_STARTUP_DELAY_MS);  // Красный
-  updateLed(LED_RED_OFF, LED_GREEN_ON, LED_BLUE_OFF);
-  delay(TIME_STARTUP_DELAY_MS);  // Зелёный
-  updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
-  delay(TIME_STARTUP_DELAY_MS);                         // Синий
-  digitalWrite(PIN_BUZZER, LOW);                        // Выключаем звук
-  updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);  // Гасим LED
+  runStartupSequence();
+  initStateMachine();
 
 #if ENABLE_SLEEP_MODE
   initSleepMode();
 #endif
-
-  // Инициализация основной логики
-  initStateMachine();
 }
 
 // -----------------------------------------------------------
