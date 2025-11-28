@@ -106,7 +106,7 @@ void updateStateMachine() {
   // --------------------------
   if (currentState == STATE_BLOCKED) {
     if (isLight) {
-      if (now - tBlink >= TIME_LED_BLINK_MS) {
+      if (now - tBlink >= LED_BLINK_MS) {
         tBlink = now;
         static bool blink = false;
         blink = !blink;
@@ -117,7 +117,7 @@ void updateStateMachine() {
     }
 
     // Автоматический выход из блокировки
-    if (now - tBlockStart >= TIME_BLOCK_MS) {
+    if (now - tBlockStart >= BLOCK_MS) {
       currentState = STATE_IDLE;
       updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     }
@@ -160,8 +160,8 @@ void updateStateMachine() {
       break;
 
     case STATE_LIGHT_WAIT:
-      if (now - tLightOn < TIME_LIGHT_READY_MS) {
-        if (now - tBlink >= TIME_LED_BLINK_MS) {
+      if (now - tLightOn < LIGHT_READY_MS) {
+        if (now - tBlink >= LED_BLINK_MS) {
           tBlink = now;
           static bool blink = false;
           blink = !blink;
@@ -172,7 +172,7 @@ void updateStateMachine() {
           currentState = STATE_READY;
           updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
           digitalWrite(PIN_BUZZER, HIGH);
-          delay(TIME_READY_BEEP_MS);
+          delay(READY_BEEP_MS);
           digitalWrite(PIN_BUZZER, LOW);
 
           if (!AUTO_SPRAY_ON_LIGHT_OFF) {

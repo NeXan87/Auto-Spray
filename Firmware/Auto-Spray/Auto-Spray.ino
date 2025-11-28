@@ -16,16 +16,16 @@ void runStartupSequence() {
   digitalWrite(PIN_BUZZER, HIGH);  // Включаем писк
 
   updateLed(LED_RED_ON, LED_GREEN_OFF, LED_BLUE_OFF);
-  delay(TIME_STARTUP_DELAY_MS);
+  delay(STARTUP_DELAY_MS);
 
   updateLed(LED_RED_OFF, LED_GREEN_ON, LED_BLUE_OFF);
-  delay(TIME_STARTUP_DELAY_MS);
+  delay(STARTUP_DELAY_MS);
 
   updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
-  delay(TIME_STARTUP_DELAY_MS);
+  delay(STARTUP_DELAY_MS);
 
   updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
-  delay(TIME_STARTUP_DELAY_MS);
+  delay(STARTUP_DELAY_MS);
 
   digitalWrite(PIN_BUZZER, LOW);  // Выключаем писк
 }
