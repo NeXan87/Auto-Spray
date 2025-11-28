@@ -111,10 +111,14 @@ void updateStateMachine() {
   // РАСПЫЛЕНИЕ (единственное место, где запускается мотор)
   // --------------------------
   if (currentState == STATE_SPRAY) {
+    digitalWrite(PIN_MOTOR_POWER_EN, HIGH);
     updateLed(LED_RED_OFF, LED_GREEN_ON, LED_BLUE_OFF);
+
     tBlockStart = millis();
     runSpray();
+    
     updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
+    digitalWrite(PIN_MOTOR_POWER_EN, LOW);
     currentState = STATE_BLOCKED;
     return;
   }
