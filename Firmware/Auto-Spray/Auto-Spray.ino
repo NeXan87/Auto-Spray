@@ -13,7 +13,7 @@
 #endif
 
 void runStartupSequence() {
-  digitalWrite(PIN_BUZZER, HIGH);  // Включаем писк
+  tone(PIN_BUZZER, 1000);  // Включаем писк
 
   updateLed(LED_RED_ON, LED_GREEN_OFF, LED_BLUE_OFF);
   delay(STARTUP_DELAY_MS);
@@ -27,7 +27,7 @@ void runStartupSequence() {
   updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
   delay(STARTUP_DELAY_MS);
 
-  digitalWrite(PIN_BUZZER, LOW);  // Выключаем писк
+  noTone(PIN_BUZZER);  // Выключаем писк
 }
 
 // -----------------------------------------------------------
@@ -46,6 +46,7 @@ void setup() {
 
   digitalWrite(PIN_MOTOR_IN1, LOW);
   digitalWrite(PIN_MOTOR_IN2, LOW);
+  noTone(PIN_BUZZER);
 
   runStartupSequence();
   initStateMachine();

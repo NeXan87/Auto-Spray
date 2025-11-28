@@ -69,7 +69,7 @@ void updateStateMachine() {
   // --------------------------
   if (currentState == STATE_RESET_BEEP) {
     if (now - tBeepStart >= RESET_BEEP_DURATION_MS) {
-      digitalWrite(PIN_BUZZER, LOW);
+      noTone(PIN_BUZZER);
       currentState = STATE_IDLE;
     }
     return;
@@ -125,7 +125,7 @@ void updateStateMachine() {
     else if (buttonPressed && (now - buttonPressStartTime >= BLOCK_RESET_HOLD_MS)) {
       currentState = STATE_RESET_BEEP;
       tBeepStart = now;
-      digitalWrite(PIN_BUZZER, HIGH);
+      tone(PIN_BUZZER, 1000);
       buttonPressed = false;
       updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     }
@@ -171,9 +171,9 @@ void updateStateMachine() {
         if (!wasSpray && isAuto) {
           currentState = STATE_READY;
           updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
-          digitalWrite(PIN_BUZZER, HIGH);
+          tone(PIN_BUZZER, 1000);
           delay(READY_BEEP_MS);
-          digitalWrite(PIN_BUZZER, LOW);
+          noTone(PIN_BUZZER);
 
           if (!AUTO_SPRAY_ON_LIGHT_OFF) {
             currentState = STATE_SPRAY;
