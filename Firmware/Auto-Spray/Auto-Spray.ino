@@ -48,8 +48,7 @@ void setup() {
   pinMode(PIN_LED_G, OUTPUT);
   pinMode(PIN_LED_B, OUTPUT);
   pinMode(PIN_BUZZER, OUTPUT);
-  pinMode(PIN_MOTOR_POWER_EN, OUTPUT);
-
+  
   digitalWrite(PIN_MOTOR_IN1, LOW);
   digitalWrite(PIN_MOTOR_IN2, LOW);
   noTone(PIN_BUZZER);
