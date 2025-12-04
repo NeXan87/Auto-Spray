@@ -21,6 +21,8 @@
 #define LIGHT_READY_MS (2UL * 1000UL)  // Время, которое свет должен быть включён, прежде чем устройство перейдёт в режим READY
 #define BLOCK_MS (5UL * 1000UL)        // Время блокировки после распыления
 #define LED_BLINK_MS 600UL             // Период мигания LED в обычных условиях (миллисекунды)
+#define LED_BLINK_ON_MS 100UL          // время включения светодиода (мс)
+#define LED_BLINK_OFF_MS 1000UL        // время выключения светодиода (мс)
 #define READY_BEEP_MS 300UL            // Продолжительность короткого сигнала при переходе в состояние READY
 #define LIGHT_READ_INTERVAL_MS 1000UL  // Опрос датчика света
 

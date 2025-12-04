@@ -14,7 +14,7 @@
 #endif
 
 void runStartupSequence() {
-  tone(PIN_BUZZER, 1000);  // Включаем писк
+  tone(PIN_BUZZER, FREQ_SQUEAKER);  // Включаем писк
 
   updateLed(LED_RED_ON, LED_GREEN_OFF, LED_BLUE_OFF);
   delay(STARTUP_DELAY_MS);

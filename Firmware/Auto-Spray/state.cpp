@@ -9,7 +9,7 @@ Bounce button;
 
 uint32_t tLightOn = 0;
 uint32_t tBlockStart = 0;
-uint32_t tBlink = 0;
+uint32_t tBlink = 0;          // таймер для мигания
 uint32_t buttonPressStartTime = 0;
 uint32_t tBeepStart = 0;
 
@@ -17,6 +17,10 @@ bool wasAutoMode = false;
 bool wasSpray = false;
 bool buttonPressed = false;
 bool readyWasCanceledInThisSession = false;
+
+// Глобальные для мигания
+static uint32_t lastBlinkToggle = 0;
+static bool blinkState = false; // false = выкл, true = вкл
 
 inline bool isLightOn() {
   static uint32_t lastRead = 0;
@@ -39,6 +43,22 @@ void initStateMachine() {
   button.interval(50);
 }
 
+// Обновлённая функция мигания
+void updateBlinkLed(LedColor red, LedColor green, LedColor blue) {
+  uint32_t now = millis();
+  uint32_t elapsed = now - lastBlinkToggle;
+
+  if (!blinkState && elapsed >= LED_BLINK_OFF_MS) {
+    blinkState = true;
+    lastBlinkToggle = now;
+    updateLed(red, green, blue);
+  } else if (blinkState && elapsed >= LED_BLINK_ON_MS) {
+    blinkState = false;
+    lastBlinkToggle = now;
+    updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
+  }
+}
+
 void updateStateMachine() {
   uint32_t now = millis();
   bool isLight = isLightOn();
@@ -47,7 +67,7 @@ void updateStateMachine() {
   button.update();
 
   // --------------------------
-  // КНОПКА: запуск ТОЛЬКО если не в блокировке и не в распылении
+  // КНОПКА
   // --------------------------
   if (button.fell()) {
     wasSpray = false;
@@ -56,13 +76,15 @@ void updateStateMachine() {
       buttonPressed = true;
       buttonPressStartTime = now;
     } else if (currentState == STATE_READY && isAutoModeEnabled()) {
-      buttonPressed = true;
+      // Отмена готовности в автоматическом режиме
       readyWasCanceledInThisSession = true;
       currentState = STATE_LIGHT_WAIT;
       tLightOn = now;
+      blinkState = false; // сброс мигания
     } else {
-      buttonPressed = false;
+      // Обычный пшик (ручной режим или другие состояния)
       currentState = STATE_SPRAY;
+      buttonPressed = false;
     }
   }
   if (button.rose()) {
@@ -70,7 +92,7 @@ void updateStateMachine() {
   }
 
   // --------------------------
-  // ПИСК ПРИ СБРОСЕ БЛОКИРОВКИ
+  // СБРОС ПИСКОМ
   // --------------------------
   if (currentState == STATE_RESET_BEEP) {
     if (now - tBeepStart >= RESET_BEEP_DURATION_MS) {
@@ -81,26 +103,27 @@ void updateStateMachine() {
   }
 
   // --------------------------
-  // РАСПЫЛЕНИЕ (единственное место, где запускается мотор)
+  // РАСПЫЛЕНИЕ
   // --------------------------
   if (currentState == STATE_SPRAY) {
     updateLed(LED_RED_OFF, LED_GREEN_ON, LED_BLUE_OFF);
-
     tBlockStart = millis();
     runSpray();
-
     updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     currentState = STATE_BLOCKED;
     return;
   }
 
-  // --- Смена режима ---
+  // --------------------------
+  // СМЕНА РЕЖИМА
+  // --------------------------
   if (isAuto && !wasAutoMode && isLight) {
     tLightOn = now;
   }
   if (!isAuto && wasAutoMode && currentState == STATE_READY) {
     currentState = STATE_LIGHT_WAIT;
     tLightOn = now;
+    blinkState = false;
   }
   wasAutoMode = isAuto;
 
@@ -109,22 +132,16 @@ void updateStateMachine() {
   // --------------------------
   if (currentState == STATE_BLOCKED) {
     if (isLight) {
-      if (now - tBlink >= LED_BLINK_MS) {
-        tBlink = now;
-        static bool blink = false;
-        blink = !blink;
-        updateLed(blink ? LED_RED_ON : LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
-      }
+      // Мигание красного с новыми таймингами
+      updateBlinkLed(LED_RED_ON, LED_GREEN_OFF, LED_BLUE_OFF);
     } else {
       updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     }
 
-    // Автоматический выход из блокировки
     if (now - tBlockStart >= BLOCK_MS) {
       currentState = STATE_IDLE;
       updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     }
-    // Сброс удержанием
     else if (buttonPressed && (now - buttonPressStartTime >= BLOCK_RESET_HOLD_MS)) {
       currentState = STATE_RESET_BEEP;
       tBeepStart = now;
@@ -132,7 +149,6 @@ void updateStateMachine() {
       buttonPressed = false;
       updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     }
-
     return;
   }
 
@@ -143,6 +159,7 @@ void updateStateMachine() {
     tBlink = now;
     wasSpray = false;
     readyWasCanceledInThisSession = false;
+    blinkState = false;
 
     if (AUTO_SPRAY_ON_LIGHT_OFF && currentState == STATE_READY) {
       currentState = STATE_SPRAY;
@@ -160,17 +177,14 @@ void updateStateMachine() {
     case STATE_IDLE:
       tLightOn = now;
       tBlink = now;
+      blinkState = false;
       currentState = STATE_LIGHT_WAIT;
       break;
 
     case STATE_LIGHT_WAIT:
       if (now - tLightOn < LIGHT_READY_MS) {
-        if (now - tBlink >= LED_BLINK_MS) {
-          tBlink = now;
-          static bool blink = false;
-          blink = !blink;
-          updateLed(LED_RED_OFF, LED_GREEN_OFF, blink ? LED_BLUE_ON : LED_BLUE_OFF);
-        }
+        // Мигание синего с новыми таймингами
+        updateBlinkLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
       } else {
         if (!readyWasCanceledInThisSession && !wasSpray && isAuto) {
           currentState = STATE_READY;
