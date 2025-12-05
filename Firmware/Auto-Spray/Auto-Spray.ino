@@ -78,8 +78,8 @@ void loop() {
 
 #if ENABLE_SLEEP_MODE
   bool lightOn = isLightOn();
-  bool isBlocked = (currentState == STATE_BLOCKED);
-  bool canSleep = (!lightOn && !isBlocked);
+  bool isNotBlocked = (currentState != STATE_BLOCKED);
+  bool canSleep = (!lightOn && isNotBlocked);
 #else
   bool canSleep = false;
 #endif
@@ -89,6 +89,6 @@ void loop() {
 #endif
 
 #if ENABLE_SLEEP_MODE
-  maybeSleep(lightOn, isBlocked);
+  maybeSleep(lightOn, isNotBlocked);
 #endif
 }
