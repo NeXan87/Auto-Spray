@@ -42,13 +42,16 @@ void setup() {
   pinMode(PIN_LIGHT, INPUT);
 #endif
 
-  pinMode(PIN_MODE, INPUT_PULLUP);
   pinMode(PIN_MOTOR_IN1, OUTPUT);
   pinMode(PIN_MOTOR_IN2, OUTPUT);
   pinMode(PIN_LED_R, OUTPUT);
   pinMode(PIN_LED_G, OUTPUT);
   pinMode(PIN_LED_B, OUTPUT);
   pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_MODE, INPUT_PULLUP);
+  pinMode(PIN_SPRAY_2, INPUT_PULLUP);
+  pinMode(PIN_SPRAY_3, INPUT_PULLUP);
+  pinMode(PIN_SPRAY_4, INPUT_PULLUP);
 
   digitalWrite(PIN_MOTOR_IN1, LOW);
   digitalWrite(PIN_MOTOR_IN2, LOW);
