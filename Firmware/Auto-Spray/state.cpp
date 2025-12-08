@@ -13,15 +13,15 @@ uint32_t tBlink = 0;  // таймер для мигания
 uint32_t buttonPressStartTime = 0;
 uint32_t tBeepStart = 0;
 
-bool wasAutoMode = false;
-bool wasSpray = false;
-bool buttonPressed = false;
-bool readyWasCanceledInThisSession = false;
+bool isAutoMode = false;
+bool isSpray = false;
+bool isButtonPressed = false;
+bool isReadyCancelInSession = false;
 bool isButtonSpray = false;
 
 // Глобальные для мигания
 static uint32_t lastBlinkToggle = 0;
-static bool blinkState = false;  // false = выкл, true = вкл
+static bool isBlinkState = false;  // false = выкл, true = вкл
 
 inline bool isLightOn() {
   static uint32_t lastRead = 0;
@@ -45,12 +45,12 @@ void updateBlinkLed(LedColor red, LedColor green, LedColor blue) {
   uint32_t now = millis();
   uint32_t elapsed = now - lastBlinkToggle;
 
-  if (!blinkState && elapsed >= LED_BLINK_OFF_CONFIRM_MODE_MS) {
-    blinkState = true;
+  if (!isBlinkState && elapsed >= LED_BLINK_OFF_CONFIRM_MODE_MS) {
+    isBlinkState = true;
     lastBlinkToggle = now;
     updateLed(red, green, blue);
-  } else if (blinkState && elapsed >= LED_BLINK_ON_CONFIRM_MODE_MS) {
-    blinkState = false;
+  } else if (isBlinkState && elapsed >= LED_BLINK_ON_CONFIRM_MODE_MS) {
+    isBlinkState = false;
     lastBlinkToggle = now;
     updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
   }
@@ -62,33 +62,37 @@ void resetState() {
   tBeepStart = 0;
   lastBlinkToggle = 0;
   buttonPressStartTime = 0;
-  wasAutoMode = false;
-  wasSpray = false;
-  buttonPressed = false;
-  blinkState = false;
-  readyWasCanceledInThisSession = false;
+  isAutoMode = false;
+  isSpray = false;
+  isButtonPressed = false;
+  isBlinkState = false;
+  isReadyCancelInSession = false;
 }
 
 void updateStateMachine() {
-  SprayMode currentMode = getCurrentMode();
   static SprayMode lastMode = MODE_MANUAL;
-  static bool lastIsSprayOnLightOn = false;
+  static bool isLastSprayOnLightOn = false;
 
+  SprayMode currentMode = getCurrentMode();
   uint32_t now = millis();
   bool isLight = isLightOn();
   bool isAuto = getCurrentMode() != MODE_MANUAL;
   bool isSprayOnLightOn = digitalRead(PIN_MODE) == LOW;  // при срабатывании таймера пшик после выключения света или сразу
+  bool isUpdateUI = isAutoMode != isAuto || lastMode != currentMode || isLastSprayOnLightOn != isSprayOnLightOn;
+  bool isStateReady = currentState == STATE_READY;
+  bool isStateBeep = currentState == STATE_RESET_BEEP;
+  bool isStateSpray = currentState == STATE_SPRAY;
+  bool isStateBlocked = currentState == STATE_BLOCKED;
 
-  if (!isAuto || lastMode != currentMode || lastIsSprayOnLightOn != isSprayOnLightOn) {
-    if (currentState != STATE_SPRAY) {
-      resetState();
-      lastMode = currentMode;
-      lastIsSprayOnLightOn = isSprayOnLightOn;
-      currentState = STATE_IDLE;
-    }
+  if (isUpdateUI && !isStateSpray) {
+    resetState();
+    currentState = STATE_IDLE;
+    lastMode = currentMode;
+    isLastSprayOnLightOn = isSprayOnLightOn;
+    isAutoMode = isAuto;
   }
 
-  if (currentState != STATE_SPRAY) {
+  if (!isStateSpray) {
     button.update();
   }
 
@@ -96,32 +100,32 @@ void updateStateMachine() {
   // КНОПКА
   // --------------------------
   if (button.fell()) {
-    wasSpray = false;
+    isSpray = false;
 
-    if (currentState == STATE_BLOCKED) {
-      buttonPressed = true;
+    if (isStateBlocked) {
+      isButtonPressed = true;
       buttonPressStartTime = now;
-    } else if (currentState == STATE_READY && isAuto) {
+    } else if (isStateReady && isAuto) {
       // Отмена готовности в автоматическом режиме
-      readyWasCanceledInThisSession = true;
+      isReadyCancelInSession = true;
       currentState = STATE_LIGHT_WAIT;
       tLightOn = now;
-      blinkState = false;  // сброс мигания
+      isBlinkState = false;  // сброс мигания
     } else {
       // Обычный пшик (ручной режим или другие состояния)
       currentState = STATE_SPRAY;
-      buttonPressed = false;
+      isButtonPressed = false;
       isButtonSpray = true;
     }
   }
   if (button.rose()) {
-    buttonPressed = false;
+    isButtonPressed = false;
   }
 
   // --------------------------
   // СБРОС ПИСКОМ
   // --------------------------
-  if (currentState == STATE_RESET_BEEP) {
+  if (isStateBeep) {
     if (now - tBeepStart >= RESET_BEEP_DURATION_MS) {
       noTone(PIN_BUZZER);
       currentState = STATE_IDLE;
@@ -132,7 +136,7 @@ void updateStateMachine() {
   // --------------------------
   // РАСПЫЛЕНИЕ
   // --------------------------
-  if (currentState == STATE_SPRAY) {
+  if (isStateSpray) {
     updateLed(LED_RED_OFF, LED_GREEN_ON, LED_BLUE_OFF);
 
     if (runSpray()) {
@@ -154,20 +158,20 @@ void updateStateMachine() {
   // --------------------------
   // СМЕНА РЕЖИМА
   // --------------------------
-  if (currentState != STATE_SPRAY && isAuto && !wasAutoMode && isLight) {
+  if (!isStateSpray && isAuto && !isAutoMode && isLight) {
     tLightOn = now;
   }
-  if (!isAuto && wasAutoMode && currentState == STATE_READY) {
+  if (!isAuto && isAutoMode && isStateReady) {
     currentState = STATE_LIGHT_WAIT;
     tLightOn = now;
-    blinkState = false;
+    isBlinkState = false;
   }
-  wasAutoMode = isAuto;
+  isAutoMode = isAuto;
 
   // --------------------------
   // БЛОКИРОВКА
   // --------------------------
-  if (currentState == STATE_BLOCKED) {
+  if (isStateBlocked) {
     if (isLight) {
       // Мигание красного с новыми таймингами
       updateBlinkLed(LED_RED_ON, LED_GREEN_OFF, LED_BLUE_OFF);
@@ -178,11 +182,11 @@ void updateStateMachine() {
     if (now - tBlockStart >= BLOCK_MS) {
       currentState = STATE_IDLE;
       updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
-    } else if (buttonPressed && (now - buttonPressStartTime >= BLOCK_RESET_HOLD_MS)) {
+    } else if (isButtonPressed && (now - buttonPressStartTime >= BLOCK_RESET_HOLD_MS)) {
       currentState = STATE_RESET_BEEP;
       tBeepStart = now;
       tone(PIN_BUZZER, FREQ_SQUEAKER);
-      buttonPressed = false;
+      isButtonPressed = false;
       updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     }
     return;
@@ -193,14 +197,18 @@ void updateStateMachine() {
   // --------------------------
   if (!isLight) {
     tBlink = now;
-    wasSpray = false;
-    readyWasCanceledInThisSession = false;
-    blinkState = false;
-    if (isSprayOnLightOn && currentState == STATE_READY) {
-      currentState = STATE_SPRAY;
-    } else {
-      currentState = STATE_IDLE;
+    isSpray = false;
+    isReadyCancelInSession = false;
+    isBlinkState = false;
+
+    if (currentState != STATE_SPRAY) {
+      if (isSprayOnLightOn && isStateReady) {
+        currentState = STATE_SPRAY;
+      } else {
+        currentState = STATE_IDLE;
+      }
     }
+    
     updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     return;
   }
@@ -212,7 +220,7 @@ void updateStateMachine() {
     case STATE_IDLE:
       tLightOn = now;
       tBlink = now;
-      blinkState = false;
+      isBlinkState = false;
       currentState = STATE_LIGHT_WAIT;
       break;
 
@@ -221,7 +229,7 @@ void updateStateMachine() {
         // Мигание синего с новыми таймингами
         updateBlinkLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
       } else {
-        if (!readyWasCanceledInThisSession && !wasSpray && isAuto) {
+        if (!isReadyCancelInSession && !isSpray && isAuto) {
           currentState = STATE_READY;
           updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
           tone(PIN_BUZZER, FREQ_SQUEAKER);
@@ -229,7 +237,7 @@ void updateStateMachine() {
           noTone(PIN_BUZZER);
           if (!isSprayOnLightOn) {
             currentState = STATE_SPRAY;
-            wasSpray = true;
+            isSpray = true;
           }
         } else {
           tLightOn = now;
