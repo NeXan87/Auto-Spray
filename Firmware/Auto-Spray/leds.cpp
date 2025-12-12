@@ -1,6 +1,5 @@
 #include "config.h"
 #include "leds.h"
-#include "utils.h"
 
 static uint8_t blinkCount = 0;
 static uint8_t currentBlink = 0;
