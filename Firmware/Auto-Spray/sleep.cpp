@@ -18,11 +18,12 @@ void sleepWDT() {
   power.sleep(SLEEP_1024MS);
 }
 
-void maybeSleep(bool lightOn, bool isNotBlocked) {
+void maybeSleep(bool lightOn, bool isNotSpray, bool isNotBlocked) {
   // Спать можно ТОЛЬКО если:
   // - свет ВЫКЛЮЧЕН
+  // - не пшикает
   // - нет блокировки
-  if (!lightOn && !isNotBlocked) {
+  if (!lightOn && isNotSpray && isNotBlocked) {
     attachInterrupt(
       digitalPinToInterrupt(PIN_BUTTON), wakeUp, FALLING);  // D2 — кнопка
     attachInterrupt(

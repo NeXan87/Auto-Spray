@@ -88,7 +88,8 @@ void loop() {
 #if ENABLE_SLEEP_MODE
   bool lightOn = isLightOn();
   bool isNotBlocked = (currentState != STATE_BLOCKED);
-  maybeSleep(lightOn, isNotBlocked);
+  bool isNotSpray = (currentState != STATE_SPRAY);
+  maybeSleep(lightOn, isNotSpray, isNotBlocked);
 #endif
 
 #if ACTIVITY_LED_ENABLED
