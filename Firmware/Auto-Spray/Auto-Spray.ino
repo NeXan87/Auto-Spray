@@ -4,10 +4,9 @@
  ********************************************************************/
 
 #include "config.h"
+#include "state.h"
 #include "leds.h"
 #include "spray.h"
-#include "sleep.h"
-#include "state.h"
 
 #if USE_OPT3001
 #include "opt3001.h"
@@ -84,15 +83,13 @@ void setup() {
 // -----------------------------------------------------------
 void loop() {
   SprayMode currentMode = getCurrentMode();
+  bool isLightOn = hasLightOn();
 
-  updateStateMachine(currentMode);
+  updateStateMachine(currentMode, isLightOn);
   updateSprayMode(currentMode);
 
 #if ENABLE_SLEEP_MODE
-  bool lightOn = isLightOn();
-  bool isNotBlocked = (currentState != STATE_BLOCKED);
-  bool isNotSpray = (currentState != STATE_SPRAY);
-  maybeSleep(lightOn, isNotSpray, isNotBlocked);
+  maybeSleep(isLightOn);
 #endif
 
 #if ACTIVITY_LED_ENABLED

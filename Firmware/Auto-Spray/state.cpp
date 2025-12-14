@@ -1,4 +1,3 @@
-#include "config.h"
 #include "state.h"
 #include "leds.h"
 #include "spray.h"
@@ -23,7 +22,7 @@ bool isButtonSpray = false;
 static uint32_t lastBlinkToggle = 0;
 static bool isBlinkState = false;  // false = выкл, true = вкл
 
-inline bool isLightOn() {
+bool hasLightOn() {
   static uint32_t lastRead = 0;
   static bool cachedValue = false;
   uint32_t now = millis();
@@ -69,13 +68,12 @@ void resetState() {
   isReadyCancelInSession = false;
 }
 
-void updateStateMachine(SprayMode currentMode) {
+void updateStateMachine(SprayMode currentMode, bool isLightOn) {
   static SprayMode lastMode = MODE_MANUAL;
   static bool isLastSprayOnLightOn = false;
 
   uint32_t now = millis();
-  bool isLight = isLightOn();
-  bool isAuto = getCurrentMode() != MODE_MANUAL;
+  bool isAuto = currentMode != MODE_MANUAL;
   bool isSprayOnLightOn = digitalRead(PIN_MODE) == LOW;  // при срабатывании таймера пшик после выключения света или сразу
   bool isUpdateUI = isAutoMode != isAuto || lastMode != currentMode || isLastSprayOnLightOn != isSprayOnLightOn;
 
@@ -153,7 +151,7 @@ void updateStateMachine(SprayMode currentMode) {
   // --------------------------
   // СМЕНА РЕЖИМА
   // --------------------------
-  if (currentState != STATE_SPRAY && isAuto && !isAutoMode && isLight) {
+  if (currentState != STATE_SPRAY && isAuto && !isAutoMode && isLightOn) {
     tLightOn = now;
   }
   if (!isAuto && isAutoMode && currentState == STATE_READY) {
@@ -167,7 +165,7 @@ void updateStateMachine(SprayMode currentMode) {
   // БЛОКИРОВКА
   // --------------------------
   if (currentState == STATE_BLOCKED) {
-    if (isLight) {
+    if (isLightOn) {
       // Мигание красного с новыми таймингами
       updateBlinkLed(LED_RED_ON, LED_GREEN_OFF, LED_BLUE_OFF);
     } else {
@@ -190,7 +188,7 @@ void updateStateMachine(SprayMode currentMode) {
   // --------------------------
   // СВЕТ ВЫКЛЮЧЕН
   // --------------------------
-  if (!isLight) {
+  if (!isLightOn) {
     tBlink = now;
     isSpray = false;
     isReadyCancelInSession = false;

@@ -5,8 +5,8 @@
 #include <Bounce2.h>
 
 void initStateMachine();
-void updateStateMachine(SprayMode currentMode);
-inline bool isLightOn();
+void updateStateMachine(SprayMode currentMode, bool isLightOn);
+bool hasLightOn();
 
 extern State currentState;
 extern Bounce button;

@@ -3,6 +3,7 @@
 #if ENABLE_SLEEP_MODE
 
 #include "sleep.h"
+#include "state.h"
 #include <GyverPower.h>
 
 void initSleepMode() {
@@ -18,12 +19,15 @@ void sleepWDT() {
   power.sleep(SLEEP_1024MS);
 }
 
-void maybeSleep(bool lightOn, bool isNotSpray, bool isNotBlocked) {
+void maybeSleep(bool isLightOn) {
   // Спать можно ТОЛЬКО если:
   // - свет ВЫКЛЮЧЕН
   // - не пшикает
   // - нет блокировки
-  if (!lightOn && isNotSpray && isNotBlocked) {
+  bool isNotBlocked = (currentState != STATE_BLOCKED);
+  bool isNotSpray = (currentState != STATE_SPRAY);
+
+  if (!isLightOn && isNotSpray && isNotBlocked) {
     attachInterrupt(
       digitalPinToInterrupt(PIN_BUTTON), wakeUp, FALLING);  // D2 — кнопка
     attachInterrupt(
