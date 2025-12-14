@@ -90,4 +90,24 @@ void updateActivityLed() {
   }
 }
 
+void updateBatteryLed() {
+  static uint32_t lastToggle = 0;
+  static bool ledState = false;
+  uint32_t now = millis();
+
+  if (ledState) {
+    if (now - lastToggle >= BATTERY_LED_ON_MS) {
+      digitalWrite(PIN_ADD_LED, LOW);
+      ledState = false;
+      lastToggle = now;
+    }
+  } else {
+    if (now - lastToggle >= BATTERY_LED_OFF_MS) {
+      digitalWrite(PIN_ADD_LED, HIGH);
+      ledState = true;
+      lastToggle = now;
+    }
+  }
+}
+
 #endif

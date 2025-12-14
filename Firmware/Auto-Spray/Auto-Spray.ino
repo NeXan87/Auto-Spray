@@ -7,6 +7,7 @@
 #include "state.h"
 #include "leds.h"
 #include "spray.h"
+#include "battery.h"
 
 #if USE_OPT3001
 #include "opt3001.h"
@@ -49,8 +50,7 @@ void setup() {
   pinMode(PIN_MOTOR_IN1, OUTPUT);
   pinMode(PIN_MOTOR_IN2, OUTPUT);
   pinMode(PIN_ADD_LED, OUTPUT);
-  pinMode(PIN_BAT_KEY, OUTPUT);
-  pinMode(PIN_BAT_KEY1, INPUT);
+  pinMode(PIN_BATTERY_EN, OUTPUT);
   pinMode(PIN_LED_R, OUTPUT);
   pinMode(PIN_LED_G, OUTPUT);
   pinMode(PIN_LED_B, OUTPUT);
@@ -64,7 +64,7 @@ void setup() {
   digitalWrite(PIN_LED_BUILTIN, LOW);
   digitalWrite(PIN_MOTOR_IN1, LOW);
   digitalWrite(PIN_MOTOR_IN2, LOW);
-  digitalWrite(PIN_BAT_KEY, HIGH);
+  digitalWrite(PIN_BATTERY_EN, LOW);
 
   runStartupSequence();
   initStateMachine();
@@ -87,6 +87,7 @@ void loop() {
 
   updateStateMachine(currentMode, isLightOn);
   updateSprayMode(currentMode);
+  updateBattery(isLightOn);
 
 #if ENABLE_SLEEP_MODE
   maybeSleep(isLightOn);
