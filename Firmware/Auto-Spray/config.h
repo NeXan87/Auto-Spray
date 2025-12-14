@@ -28,7 +28,7 @@
 #define BATTERY_LOW_VOLTAGE_MV 3400UL     // напряжение разряженной батареи
 #define BATTERY_CHECK_INTERVAL_MS 5000UL  // период обновления заряда батареи раз
 #define BATTERY_LED_ON_MS 100UL           // длительность вспышки
-#define BATTERY_LED_OFF_MS 500UL          // период выключенного светодиода
+#define BATTERY_LED_OFF_MS 1000UL          // период выключенного светодиода
 
 // -----------------------------------------------------------
 // ТАЙМИНГИ
