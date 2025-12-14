@@ -4,6 +4,7 @@
 
 #include "sleep.h"
 #include "state.h"
+#include "leds.h"
 #include <GyverPower.h>
 
 void initSleepMode() {
@@ -24,15 +25,16 @@ void maybeSleep(bool isLightOn) {
   // - свет ВЫКЛЮЧЕН
   // - не пшикает
   // - нет блокировки
-  bool isNotBlocked = (currentState != STATE_BLOCKED);
-  bool isNotSpray = (currentState != STATE_SPRAY);
+  bool isIdle = (currentState == STATE_IDLE);
 
-  if (!isLightOn && isNotSpray && isNotBlocked) {
+  if (!isLightOn && isIdle) {
     attachInterrupt(
       digitalPinToInterrupt(PIN_BUTTON), wakeUp, FALLING);  // D2 — кнопка
     attachInterrupt(
       digitalPinToInterrupt(PIN_LIGHT), wakeUp, CHANGE);  // D3 — датчик света
 
+    disableOutputPins();
+    updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     power.sleep(SLEEP_FOREVER);
 
     detachInterrupt(digitalPinToInterrupt(PIN_BUTTON));

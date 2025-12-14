@@ -7,6 +7,7 @@
 #include "state.h"
 #include "leds.h"
 #include "spray.h"
+#include "utils.h"
 #include "battery.h"
 
 #if USE_OPT3001
@@ -37,14 +38,6 @@ void runStartupSequence() {
   noTone(PIN_BUZZER);  // Выключаем писк
 }
 
-void disableOutputPins() {
-  digitalWrite(PIN_ADD_LED, LOW);
-  digitalWrite(PIN_LED_BUILTIN, LOW);
-  digitalWrite(PIN_MOTOR_IN1, LOW);
-  digitalWrite(PIN_MOTOR_IN2, LOW);
-  digitalWrite(PIN_BATTERY_EN, LOW);
-}
-
 // -----------------------------------------------------------
 // SETUP
 // -----------------------------------------------------------
@@ -73,6 +66,7 @@ void setup() {
   disableOutputPins();
   runStartupSequence();
   initStateMachine();
+  digitalWrite(PIN_LED_BUILTIN, LOW);
 
 #if ENABLE_SLEEP_MODE
   initSleepMode();

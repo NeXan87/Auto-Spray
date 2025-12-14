@@ -12,3 +12,4 @@ enum SprayMode {
 bool checkSprayMode(SprayMode mode);
 SprayMode getCurrentMode();
 void disableOutputPins();
+void disableOutputPins();
