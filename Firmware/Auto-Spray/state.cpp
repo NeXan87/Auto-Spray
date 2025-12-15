@@ -78,6 +78,8 @@ void updateStateMachine(SprayMode currentMode, bool isLightOn) {
   bool isSprayOnLightOn = digitalRead(PIN_SW_MODE) == LOW;  // при срабатывании таймера пшик после выключения света или сразу
   bool isUpdateUI = isAutoMode != isAuto || lastMode != currentMode || isLastSprayOnLightOn != isSprayOnLightOn;
 
+  button.update();
+
   if (isBatLow()) {
     currentState = STATE_BLOCKED;
   }
@@ -90,14 +92,10 @@ void updateStateMachine(SprayMode currentMode, bool isLightOn) {
     isAutoMode = isAuto;
   }
 
-  if (!isBatLow() && currentState != STATE_SPRAY) {
-    button.update();
-  }
-
   // --------------------------
   // КНОПКА
   // --------------------------
-  if (button.fell()) {
+  if (button.fell() && !isBatLow() && currentState != STATE_SPRAY) {
     isSpray = false;
 
     if (currentState == STATE_BLOCKED) {
@@ -206,7 +204,7 @@ void updateStateMachine(SprayMode currentMode, bool isLightOn) {
         currentState = STATE_IDLE;
       }
     }
-    
+
     updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     return;
   }
