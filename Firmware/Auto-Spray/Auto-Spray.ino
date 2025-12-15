@@ -42,7 +42,7 @@ void runStartupSequence() {
 // SETUP
 // -----------------------------------------------------------
 void setup() {
-  Serial.begin(9600);
+  // Serial.begin(9600);
 #if USE_OPT3001
   pinMode(PIN_LIGHT, INPUT_PULLUP);
   initOpt3001();
