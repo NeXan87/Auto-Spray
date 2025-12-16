@@ -25,5 +25,5 @@ void disableOutputPins() {
   digitalWrite(PIN_ADD_LED, LOW);
   digitalWrite(PIN_MOTOR_IN1, LOW);
   digitalWrite(PIN_MOTOR_IN2, LOW);
-  digitalWrite(PIN_BATTERY_EN, LOW);
+  digitalWrite(PIN_BATTERY_EN, HIGH);
 }
