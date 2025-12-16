@@ -13,15 +13,15 @@
 
 ### Общая схема
 
-![Принципиальная схема умного освежителя воздуха на Arduino Pro Mini](https://github.com/NeXan87/Auto-Spray/blob/refactor/Electric%20Diagram/Smart-Air-Freshener.png?raw=true)
+![Принципиальная схема умного освежителя воздуха на Arduino Pro Mini](https://github.com/NeXan87/Smart-Air-Freshener/blob/refactor/Electric%20Diagram/Smart-Air-Freshener.png?raw=true)
 
 ### Драйвер двигателя MX1508
 
-![Схема подключения драйвера двигателя MX1508](https://github.com/NeXan87/Auto-Spray/blob/refactor/Electric%20Diagram/mx1508.png?raw=true)
+![Схема подключения драйвера двигателя MX1508](https://github.com/NeXan87/Smart-Air-Freshener/blob/refactor/Electric%20Diagram/mx1508.png?raw=true)
 
 ### DC-DC преобразователь
 
-![Схема подключения DC-DC преобразователя](https://github.com/NeXan87/Auto-Spray/blob/refactor/Electric%20Diagram/DC-DC_converter.jpg?raw=true)
+![Схема подключения DC-DC преобразователя](https://github.com/NeXan87/Smart-Air-Freshener/blob/refactor/Electric%20Diagram/DC-DC_converter.jpg?raw=true)
 
 ---
 
