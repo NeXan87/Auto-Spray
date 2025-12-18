@@ -43,7 +43,7 @@ void disableInputPullups() {
 }
 
 void disableHardware() {
-  power.hardwareDisable(PWR_I2C | PWR_SPI | PWR_USB);
+  power.hardwareDisable(PWR_UART0 | PWR_I2C | PWR_SPI | PWR_USB);
 }
 
 void enableADC() {
