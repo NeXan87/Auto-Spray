@@ -18,3 +18,5 @@ void disableInputPullups();
 void disableHardware();
 void enableADC();
 void disableADC();
+void beepStart();
+void beepStop();

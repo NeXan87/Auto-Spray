@@ -20,7 +20,7 @@
 #endif
 
 void runStartupSequence() {
-  tone(PIN_BUZZER, FREQ_SQUEAKER);  // Включаем писк
+  beepStart();  // Включаем писк
 
   digitalWrite(PIN_ADD_LED, HIGH);
   digitalWrite(PIN_LED_BUILTIN, HIGH);
@@ -37,7 +37,7 @@ void runStartupSequence() {
   digitalWrite(PIN_ADD_LED, LOW);
   digitalWrite(PIN_LED_BUILTIN, LOW);
 
-  noTone(PIN_BUZZER);  // Выключаем писк
+  beepStop();  // Выключаем писк
 }
 
 // -----------------------------------------------------------

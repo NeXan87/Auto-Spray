@@ -123,7 +123,7 @@ void updateStateMachine(SprayMode currentMode, bool isLightOn) {
   // --------------------------
   if (currentState == STATE_RESET_BEEP) {
     if (now - tBeepStart >= RESET_BEEP_DURATION_MS) {
-      noTone(PIN_BUZZER);
+      beepStop();
       currentState = STATE_IDLE;
     }
     return;
@@ -181,8 +181,8 @@ void updateStateMachine(SprayMode currentMode, bool isLightOn) {
     } else if (isButtonPressed && (now - buttonPressStartTime >= BLOCK_RESET_HOLD_MS)) {
       currentState = STATE_RESET_BEEP;
       tBeepStart = now;
-      tone(PIN_BUZZER, FREQ_SQUEAKER);
       isButtonPressed = false;
+      beepStart();
       updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_OFF);
     }
     return;
@@ -228,9 +228,9 @@ void updateStateMachine(SprayMode currentMode, bool isLightOn) {
         if (!isReadyCancelInSession && !isSpray && isAuto) {
           currentState = STATE_READY;
           updateLed(LED_RED_OFF, LED_GREEN_OFF, LED_BLUE_ON);
-          tone(PIN_BUZZER, FREQ_SQUEAKER);
+          beepStart();
           delay(READY_BEEP_MS);
-          noTone(PIN_BUZZER);
+          beepStop();
           if (!isSprayOnLightOn) {
             currentState = STATE_SPRAY;
             isSpray = true;

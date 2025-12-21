@@ -55,3 +55,13 @@ void enableADC() {
 void disableADC() {
   power.hardwareDisable(PWR_ADC);
 }
+
+void beepStart() {
+  power.hardwareEnable(PWR_TIMER2);
+  tone(PIN_BUZZER, FREQ_SQUEAKER);
+}
+
+void beepStop() {
+  noTone(PIN_BUZZER);
+  power.hardwareDisable(PWR_TIMER2);
+}
